@@ -1,0 +1,18 @@
+*****************************************************************************************
+*						Exemplo - Modelo de memristor									*
+*****************************************************************************************
+simulator lang=spectre
+include "32nm_hp.pm"
+include "memristor.scs"
+include "test.scs"
+
+Va node 0 vsource type=pwl wave=[0 1u 10n 1u 10.01n 1 20n 1 20.01n 1u 30n 1u 30.01n -1 40n -1 40.01n 1u]
+
+XR1 node  0 memristor
+TMR node2 0 bsource v=v(node)/i(XR1)
+
+
+mytran tran stop=30n start=0
+
+
+***********************************************************************

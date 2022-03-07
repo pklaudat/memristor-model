@@ -3,27 +3,22 @@ simulator lang=spectre
 *********************************************************************************************
 *							SUBCKT MEMRISTOR										*
 *********************************************************************************************
-parameters Ron=5e3 Roff=30e3 Rinit=5e3 alpha=0 beta=1e18 It=25e-6 It=25e-6 C1=0.1 C2=0
+parameters Ron=5e3 Roff=30e3 Rinit=5e3 alpha=0 beta=1e18 It=25e-6 C1=0.1 C2=0
 
-subckt memristor
-parameters Ron=5e3 Roff=30e3 Rinit=5e3 alpha=0 beta=1e18 It=25e-6 It=25e-6 C1=0.1 C2=0
-	Baux1 Im 0 bsource v=(v(plus,minus)/v(x))
-	Baux2 f1 0 bsource v=(((Roff-V(x))/Roff + C1)*beta*y + ((Roff-V(x))/Roff + C1)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It)))
-	Baux3 f2 0 bsource v=(((V(x)-Ron)/Roff + C2)*beta*y + ((V(x)-Ron)/Roff + C2)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It)))
-	Bx 0 x bsource i=(((abs(v(Im))))
-	Rmem plus minus bsource r=abs(v(x))
-	Cx x 0 capacitor c=1 ic=Rinit	
+real f1(real y, real vx) {
+	return (((Roff-vx)/Roff + C1)*beta*y + ((Roff-vx)/Roff + C1)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It)))
+
+}
+real f2(real y, real vx) {
+	return (((Roff-vx)/Roff + C1)*beta*y + ((Roff-vx)/Roff + C1)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It)))
+}
+
+subckt memristor (node gnd)
+	Baux1 Im gnd bsource v=(v(plus,minus)/v(x,gnd))
+	Bx gnd x bsource i=((v(Im,gnd)> 0) && (v(x) < Roff)) ? f1(v(Im,gnd),v(x,gnd)) : ((((v(Im,gnd) < 0) && (v(x,gnd)>Ron)) ? f2(v(Im,gnd),v(x,gnd)) : 0))
+	Rmem plus minus bsource r=v(x,gnd)
+	Cx x gnd capacitor c=1 ic=Rinit	
 	
+ends memristor
 
 
-real f1(real vref, real Roff,
-.subckt memristor plus minus PARAMS: Ron=5k Roff=30k Rinit=5k alpha=0 beta=1e18 It=25u C1 = 0.1 C2 = 0i
-
-
-Bx 0 x I='((Im()> 0) && (V(x) < Roff)) ? {f1(Im())} : ((((Im() < 0) && (V(x)>Ron)) ? {f2(Im())} : 0))'
-Rmem plus minus r={V(x)}
-Cx x 0 1 IC={Rinit} 
-.func Im() = {V(plus,minus)/V(x)}
-.func f1(y)={((Roff-V(x))/Roff + C1)*beta*y + ((Roff-V(x))/Roff + C1)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It))} 
-.func f2(y)={((V(x)-Ron)/Roff + C2)*beta*y + ((V(x)-Ron)/Roff + C2)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It))} 
-.ends
