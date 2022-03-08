@@ -9,7 +9,7 @@ VDD node 0 vsource type=pwl wave=[0 1u 10n 1u 10.01n 1 20n 1 20.01n 1u 30n 1u 30
 VSS node2 0 vsource dc=0
 XR1 node node2 memristor
 
-mytran tran stop=60n start=0p
+mytran tran stop=60n start=500p
 
 
 ***********************************************************************
