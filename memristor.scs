@@ -13,12 +13,11 @@ real f2(real y, real vx) {
 	return (((Roff-vx)/Roff + C1)*beta*y + ((Roff-vx)/Roff + C1)*0.5*(alpha-beta)*(abs(y+It)-abs(y-It)))
 }
 
-subckt memristor (node gnd)
-	Baux1 Im gnd bsource v=(v(plus,minus)/v(x,gnd))
-	Bx gnd x bsource i=((v(Im,gnd)> 0) && (v(x) < Roff)) ? f1(v(Im,gnd),v(x,gnd)) : ((((v(Im,gnd) < 0) && (v(x,gnd)>Ron)) ? f2(v(Im,gnd),v(x,gnd)) : 0))
-	Rmem plus minus bsource r=v(x,gnd)
-	Cx x gnd capacitor c=1 ic=Rinit	
-	
+subckt memristor (plus vref)
+	Cx x vref capacitor c=1 ic=Rinit	
+	Bx vref x bsource i=((v(Im,vref) > 0) && (v(x,vref) < Roff)) ? f1(v(Im,vref),v(x,vref)) : ((((v(Im,vref) < 0) && (v(x,vref) > Ron)) ? f2(v(Im,vref),v(x,vref)) : 0))
+	ImSource Im vref bsource v=(v(plus,vref)/v(x,vref))
+	Rmem plus vref bsource r=v(x,vref)	
 ends memristor
 
 
