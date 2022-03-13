@@ -1,0 +1,27 @@
+Analog begin
+If (eta*V(TE,BE)>=0) begin
+If (V(XSV)>=xp) begin
+F=exp(-alphap*(V(XSV)-xp))*(((xp-V(XSV))/(1-xp))+1);
+end else F=1;
+end else If (eta*V(TE,BE)<0) begin
+If (V(XSV)<=(1-xn)) begin
+F=exp(alphan*(V(XSV)+xn-1))*(V(XSV)/(1-xn));
+End else F=1;
+end
+If (V(TE,BE)>Vp) begin
+G=Ap*(exp(V(TE,BE))-exp(Vp));
+end else If (V(TE,BE)<=Vp ) begin
+If (V(TE,BE)<-Vn) begin
+G=-An*(exp(-V(TE,BE))-exp(Vn));
+end else G=0;
+end
+If (V(TE,BE)>=0) begin
+I(BE,TE)<+(a1*V(XSV)*sinh(b*V(TE,BE)));
+end else If (V(TE,BE)<0) begin
+I(BE,TE)<+(a2*V(XSV)*sinh(b*V(TE,BE)));
+end
+Gx=eta*G*F;
+I(XSV)<+c*ddt(V(XSV));
+I(XSV)<+ Gx *V(XSV);
+end
+endmodule

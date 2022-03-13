@@ -1,0 +1,26 @@
+‘include "disciplines.h"
+2
+3 module memristor(p,n);
+4 parameter real ud =1e-14;
+5 parameter real D = 10e-9;
+6 parameter real Ron = 100;
+7 parameter real Roff = 16000
+8 parameter real Wo = 5e-9;
+9 parameter real p_drift = 1;
+...
+26 analog function real stp;
+27 input i;
+28 real i;
+29 begin
+30 stp=(i >= 0) ? 1:0;
+31 end
+32 endfunction
+33 /////////////////////////////////
+34 analog begin
+35 vd = ud*Ron*I(p,n)*f_drift/D;
+36 W = idt(v,Wo);
+37 M = (Ron*(W/D))+(Roff*(1-W/D));
+38 V(p,n) <+ I(p,n)*M;
+39 f_drift = 1-pow((W/D)-stp(-I(p,n)),(2*p_drift));
+40 end
+41 endmodule
